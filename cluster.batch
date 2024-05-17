@@ -6,8 +6,9 @@
 #SBATCH --time=3-00:00:00
 #SBATCH --partition=bigbatch
 
-for i in $(seq 1 $SLURM_NTASKS)
+for i in $(seq 0 $((SLURM_NTASKS-1)))
 do
-    srun --exclusive -N1 -n1 poetry run python cleanrl/dqn_atari_jax.py --env-id BreakoutNoFrameskip-v4 --total-timesteps 1000000 --track --wandb-project-name atari &
+    exp_name="frameskip-val-2-task-N${i}-$(date +%Y%m%d%H%M%S)"
+    srun --exclusive -N1 -n1 poetry run python cleanrl/dqn_atari_jax.py --exp-name ${exp_name} --env-id BreakoutNoFrameskip-v4 --frame_skip 2 --total-timesteps 1000000 --track --wandb-project-name atari &
 done
 wait
