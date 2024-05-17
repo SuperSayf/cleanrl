@@ -6,4 +6,4 @@
 #SBATCH --time=3000:00
 #SBATCH --partition=bigbatch
 
-poetry run python cleanrl/dqn_atari_jax.py --env-id BreakoutNoFrameskip-v4 --capture_video
+poetry run python cleanrl/dqn_atari_jax.py --env-id BreakoutNoFrameskip-v4 --total-timesteps 1000000 --track --wandb-project-name atari
