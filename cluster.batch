@@ -8,7 +8,7 @@
 
 for i in $(seq 0 $((SLURM_NTASKS-1)))
 do
-    exp_name="frameskip_val_2_task_N${i}_$(date +%Y%m%d%H%M%S)"
+    exp_name="frameskip-val-2-task-N${i}"
     srun --exclusive -N1 -n1 poetry run python cleanrl/dqn_atari_jax.py --exp-name ${exp_name} --env-id BreakoutNoFrameskip-v4 --frame_skip 2 --total-timesteps 1000000 --track --wandb-project-name atari &
 done
 wait
