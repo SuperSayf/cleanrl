@@ -1,0 +1,9 @@
+#!/bin/bash
+#SBATCH --job-name=Atari
+#SBATCH --output="/home-mscluster/sjumoorty2/atari/cleanrl/node_output.txt"
+#SBATCH --ntasks=1
+# increase the time here if you need more than 10 minutes to run your job.
+#SBATCH --time=3000:00
+#SBATCH --partition=bigbatch
+
+poetry run python cleanrl/dqn_atari_jax.py --env-id BreakoutNoFrameskip-v4 --capture_video
