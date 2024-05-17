@@ -1,9 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=Atari
-#SBATCH --output="/home-mscluster/sjumoorty2/atari/cleanrl/node_output.txt"
-#SBATCH --ntasks=1
-# increase the time here if you need more than 10 minutes to run your job.
+#SBATCH --output="/home-mscluster/sjumoorty2/atari/cleanrl/node_output/node_output_%j.txt"
+#SBATCH --ntasks=5
+#SBATCH --nodes=5
 #SBATCH --time=3-00:00:00
 #SBATCH --partition=bigbatch
 
-poetry run python cleanrl/dqn_atari_jax.py --env-id BreakoutNoFrameskip-v4 --total-timesteps 1000000 --track --wandb-project-name atari
+for i in $(seq 1 $SLURM_NTASKS)
+do
+    srun --exclusive -N1 -n1 poetry run python cleanrl/dqn_atari_jax.py --env-id BreakoutNoFrameskip-v4 --total-timesteps 1000000 --track --wandb-project-name atari &
+done
+wait
