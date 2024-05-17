@@ -8,7 +8,7 @@
 
 for i in $(seq 0 $((SLURM_NTASKS-1)))
 do
-    exp_name="frameskip-val-6-task-N${i}"
-    srun --exclusive -N1 -n1 poetry run python cleanrl/dqn_atari_jax.py --exp-name ${exp_name} --env-id ALE/Breakout-v5 --frame_skip 6 --total-timesteps 1000000 --track --wandb-project-name atari &
+    exp_name="frameskip-val-0-task-N${i}"
+    srun --exclusive -N1 -n1 poetry run python cleanrl/dqn_atari_jax.py --exp-name ${exp_name} --env-id ALE/Breakout-v5 --frame_skip 0 --total-timesteps 1000000 --track --wandb-project-name atari &
 done
 wait
