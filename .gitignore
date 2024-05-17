@@ -1,3 +1,7 @@
+# Sayf things
+pyproject.toml
+poetry.lock
+
 slurm
 .aim
 #runs
