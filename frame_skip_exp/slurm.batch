@@ -22,6 +22,6 @@ do
     frame_skip=${frame_skip_values[frame_skip_idx]}
     
     exp_name="frameskip-val-${frame_skip}-task-N${i}"
-    srun --exclusive -N1 -n1 poetry run python ~/cleanrl/dqn_atari_jax.py --exp-name ${exp_name} --env-id ALE/Breakout-v5 --frame_skip ${frame_skip} --total-timesteps 1000000 --track --wandb-project-name atari &
+    srun --exclusive -N1 -n1 poetry run python ~/cleanrl/cleanrl/dqn_atari_jax.py --exp-name ${exp_name} --env-id ALE/Breakout-v5 --frame_skip ${frame_skip} --total-timesteps 1000000 --track --wandb-project-name atari &
 done
 wait
