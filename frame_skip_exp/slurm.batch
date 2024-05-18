@@ -1,0 +1,27 @@
+#!/bin/bash
+#SBATCH --job-name=Atari
+#SBATCH --output="/home-mscluster/sjumoorty2/atari/cleanrl/node_output/node_output_%j.txt"
+#SBATCH --ntasks=20
+#SBATCH --nodes=20
+#SBATCH --time=3-00:00:00
+#SBATCH --partition=bigbatch
+
+# Array of frame skip values to test
+frame_skip_values=(2 4 6 8)
+
+# Number of machines to use per frame skip value
+machines_per_value=5
+
+# Calculate the total number of frame skip values
+num_values=${#frame_skip_values[@]}
+
+for i in $(seq 0 $((SLURM_NTASKS-1)))
+do
+    # Determine which frame skip value to use based on the task ID
+    frame_skip_idx=$((i / machines_per_value))
+    frame_skip=${frame_skip_values[frame_skip_idx]}
+    
+    exp_name="frameskip-val-${frame_skip}-task-N${i}"
+    srun --exclusive -N1 -n1 poetry run python cleanrl/dqn_atari_jax.py --exp-name ${exp_name} --env-id ALE/Breakout-v5 --frame_skip ${frame_skip} --total-timesteps 1000000 --track --wandb-project-name atari &
+done
+wait
