@@ -91,7 +91,8 @@ def make_env(env_id, seed, idx, capture_video, run_name, frame_skip):
         env = gym.wrappers.RecordEpisodeStatistics(env)
 
         env = NoopResetEnv(env, noop_max=30)
-        env = MaxAndSkipEnv(env, skip=frame_skip)
+        if frame_skip > 0:
+            env = MaxAndSkipEnv(env, skip=frame_skip)
         env = EpisodicLifeEnv(env)
         if "FIRE" in env.unwrapped.get_action_meanings():
             env = FireResetEnv(env)
