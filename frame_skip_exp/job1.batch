@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name="atari_1"
+#SBATCH --job-name="atari_2"
 #SBATCH --output="/home-mscluster/sjumoorty2/atari/cleanrl/node_output/node_output_%j.txt"
 #SBATCH --ntasks=5
 #SBATCH --nodes=5
@@ -8,7 +8,7 @@
 #SBATCH --partition=bigbatch
 
 frame_skip=0
-total_timesteps=10000000
+total_timesteps=1000000
 
 for i in $(seq 0 $((SLURM_NTASKS-1))); do
     exp_name="frameskip-val-${frame_skip}-task-N${i}"
