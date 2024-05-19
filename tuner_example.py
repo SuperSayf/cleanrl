@@ -9,8 +9,7 @@ tuner = Tuner(
     direction="maximize",
     aggregation_type="average",
     target_scores={
-        "CartPole-v1": [0, 500],
-        "Acrobot-v1": [-500, 0],
+        "ALE/Breakout-v5": [0, 500],
     },
     params_fn=lambda trial: {
         "learning-rate": trial.suggest_float("learning-rate", 0.0003, 0.003, log=True),
