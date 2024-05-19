@@ -1,18 +1,16 @@
 #!/bin/bash
 
 # Check if frame skip value, job name, and total timesteps are provided
-if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
-    echo "Error: Frame skip value, job name, and/or total timesteps not provided."
-    echo "Usage: $0 <frame_skip_value> <job_name> <total_timesteps>"
+if [ -z "$1" ] || [ -z "$2" ]; then
+    echo "Error: Frame skip value, and/or total timesteps not provided."
+    echo "Usage: $0 <frame_skip_value> <total_timesteps>"
     exit 1
 fi
 
 # Set the frame skip value, job name, and total timesteps
 frame_skip="$1"
-job_name="$2"
-total_timesteps="$3"
+total_timesteps="$2"
 
-#SBATCH --job-name=${job_name}
 #SBATCH --output="/home-mscluster/sjumoorty2/atari/cleanrl/node_output/node_output_%j.txt"
 #SBATCH --ntasks=5
 #SBATCH --nodes=5
