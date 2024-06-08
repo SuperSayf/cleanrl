@@ -15,6 +15,8 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+cd ~/cleanrl/frame_skip_exp
+
 # Activate the conda environment
 conda activate atari
 
