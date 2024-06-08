@@ -20,6 +20,9 @@ cd ~/cleanrl/frame_skip_exp
 # Activate the conda environment
 conda activate atari
 
+# Ensure Poetry is available
+export PATH="$HOME/.local/bin:$PATH"
+
 # Check if the correct number of arguments are provided
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <frame_skip> <total_timesteps>"
