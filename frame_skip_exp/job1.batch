@@ -2,8 +2,8 @@
 
 #SBATCH --job-name="FS_Atari"
 #SBATCH --output="/home-mscluster/sjumoorty2/cleanrl/node_output/node_output_%j.txt"
-#SBATCH --ntasks=5
-#SBATCH --nodes=5
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
 #SBATCH --time=3-00:00:00
 #SBATCH --partition=bigbatch
 
