@@ -15,4 +15,4 @@ export FRAME_SKIP
 export TOTAL_TIMESTEPS
 
 # Submit the batch file
-sbatch job1.batch
+sbatch ~/cleanrl/frame_skip_exp/job1.batch
