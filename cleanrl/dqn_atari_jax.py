@@ -1,33 +1,3 @@
-# docs and experiment results can be found at https://docs.cleanrl.dev/rl-algorithms/dqn/#dqn_atari_jaxpy
-import os
-import random
-import time
-from dataclasses import dataclass
-
-os.environ[
-    "XLA_PYTHON_CLIENT_MEM_FRACTION"
-] = "0.7"  # see https://github.com/google/jax/discussions/6332#discussioncomment-1279991
-
-import flax
-import flax.linen as nn
-import gymnasium as gym
-import jax
-import jax.numpy as jnp
-import numpy as np
-import optax
-import tyro
-from flax.training.train_state import TrainState
-from stable_baselines3.common.atari_wrappers import (
-    ClipRewardEnv,
-    EpisodicLifeEnv,
-    FireResetEnv,
-    MaxAndSkipEnv,
-    NoopResetEnv,
-)
-from stable_baselines3.common.buffers import ReplayBuffer
-from torch.utils.tensorboard import SummaryWriter
-
-
 @dataclass
 class Args:
     exp_name: str = os.path.basename(__file__)[: -len(".py")]
@@ -81,7 +51,28 @@ class Args:
     frame_skip: int = 4
     """the number of frames to skip"""
 
-def make_env(env_id, seed, idx, capture_video, run_name, frame_skip):
+    # Grayscaling arguments
+    use_grayscale: bool = True
+    """whether to use grayscaling"""
+    kernel_size: int = 1
+    """kernel size for grayscaling"""
+    weighting_scheme: str = "average"
+    """weighting scheme for grayscaling, options: 'average', 'luminosity'"""
+
+
+def custom_grayscale(obs, kernel_size=1, weighting_scheme="average"):
+    if weighting_scheme == "luminosity":
+        weights = np.array([0.299, 0.587, 0.114])
+    else:
+        weights = np.array([1/3, 1/3, 1/3])
+
+    gray_obs = np.dot(obs[..., :3], weights)
+    if kernel_size > 1:
+        gray_obs = cv2.GaussianBlur(gray_obs, (kernel_size, kernel_size), 0)
+    return gray_obs
+
+
+def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, use_grayscale, kernel_size, weighting_scheme):
     def thunk():
         if capture_video and idx == 0:
             env = gym.make(env_id, render_mode="rgb_array")
@@ -98,43 +89,15 @@ def make_env(env_id, seed, idx, capture_video, run_name, frame_skip):
             env = FireResetEnv(env)
         env = ClipRewardEnv(env)
         env = gym.wrappers.ResizeObservation(env, (84, 84))
-        env = gym.wrappers.GrayScaleObservation(env)
+        if use_grayscale:
+            env = gym.wrappers.TransformObservation(
+                env, lambda obs: custom_grayscale(obs, kernel_size, weighting_scheme))
         env = gym.wrappers.FrameStack(env, 4)
 
         env.action_space.seed(seed)
         return env
 
     return thunk
-
-
-# ALGO LOGIC: initialize agent here:
-class QNetwork(nn.Module):
-    action_dim: int
-
-    @nn.compact
-    def __call__(self, x):
-        x = jnp.transpose(x, (0, 2, 3, 1))
-        x = x / (255.0)
-        x = nn.Conv(32, kernel_size=(8, 8), strides=(4, 4), padding="VALID")(x)
-        x = nn.relu(x)
-        x = nn.Conv(64, kernel_size=(4, 4), strides=(2, 2), padding="VALID")(x)
-        x = nn.relu(x)
-        x = nn.Conv(64, kernel_size=(3, 3), strides=(1, 1), padding="VALID")(x)
-        x = nn.relu(x)
-        x = x.reshape((x.shape[0], -1))
-        x = nn.Dense(512)(x)
-        x = nn.relu(x)
-        x = nn.Dense(self.action_dim)(x)
-        return x
-
-
-class TrainState(TrainState):
-    target_params: flax.core.FrozenDict
-
-
-def linear_schedule(start_e: float, end_e: float, duration: int, t: int):
-    slope = (end_e - start_e) / duration
-    return max(slope * t + start_e, end_e)
 
 
 if __name__ == "__main__":
@@ -149,7 +112,8 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
         )
     args = tyro.cli(Args)
     assert args.num_envs == 1, "vectorized envs are not supported at the moment"
-    run_name = f"{args.env_id}__{args.exp_name}__{args.seed}__{int(time.time())}"
+    run_name = f"{args.env_id}__{args.exp_name}__{
+        args.seed}__{int(time.time())}"
     if args.track:
         import wandb
 
@@ -165,7 +129,8 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
     writer = SummaryWriter(f"runs/{run_name}")
     writer.add_text(
         "hyperparameters",
-        "|param|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}|" for key, value in vars(args).items()])),
+        "|param|value|\n|-|-|\n%s" % (
+            "\n".join([f"|{key}|{value}|" for key, value in vars(args).items()])),
     )
 
     # TRY NOT TO MODIFY: seeding
@@ -176,9 +141,11 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
 
     # env setup
     envs = gym.vector.SyncVectorEnv(
-        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip) for i in range(args.num_envs)]
+        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip,
+                  args.use_grayscale, args.kernel_size, args.weighting_scheme) for i in range(args.num_envs)]
     )
-    assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
+    assert isinstance(envs.single_action_space,
+                      gym.spaces.Discrete), "only discrete action space is supported"
 
     obs, _ = envs.reset(seed=args.seed)
 
@@ -193,7 +160,8 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
 
     q_network.apply = jax.jit(q_network.apply)
     # This step is not necessary as init called on same observation and key will always lead to same initializations
-    q_state = q_state.replace(target_params=optax.incremental_update(q_state.params, q_state.target_params, 1))
+    q_state = q_state.replace(target_params=optax.incremental_update(
+        q_state.params, q_state.target_params, 1))
 
     rb = ReplayBuffer(
         args.buffer_size,
@@ -206,16 +174,21 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
 
     @jax.jit
     def update(q_state, observations, actions, next_observations, rewards, dones):
-        q_next_target = q_network.apply(q_state.target_params, next_observations)  # (batch_size, num_actions)
+        q_next_target = q_network.apply(
+            # (batch_size, num_actions)
+            q_state.target_params, next_observations)
         q_next_target = jnp.max(q_next_target, axis=-1)  # (batch_size,)
         next_q_value = rewards + (1 - dones) * args.gamma * q_next_target
 
         def mse_loss(params):
-            q_pred = q_network.apply(params, observations)  # (batch_size, num_actions)
-            q_pred = q_pred[jnp.arange(q_pred.shape[0]), actions.squeeze()]  # (batch_size,)
+            # (batch_size, num_actions)
+            q_pred = q_network.apply(params, observations)
+            # (batch_size,)
+            q_pred = q_pred[jnp.arange(q_pred.shape[0]), actions.squeeze()]
             return ((q_pred - next_q_value) ** 2).mean(), q_pred
 
-        (loss_value, q_pred), grads = jax.value_and_grad(mse_loss, has_aux=True)(q_state.params)
+        (loss_value, q_pred), grads = jax.value_and_grad(
+            mse_loss, has_aux=True)(q_state.params)
         q_state = q_state.apply_gradients(grads=grads)
         return loss_value, q_pred, q_state
 
@@ -225,24 +198,30 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
     obs, _ = envs.reset(seed=args.seed)
     for global_step in range(args.total_timesteps):
         # ALGO LOGIC: put action logic here
-        epsilon = linear_schedule(args.start_e, args.end_e, args.exploration_fraction * args.total_timesteps, global_step)
+        epsilon = linear_schedule(
+            args.start_e, args.end_e, args.exploration_fraction * args.total_timesteps, global_step)
         if random.random() < epsilon:
-            actions = np.array([envs.single_action_space.sample() for _ in range(envs.num_envs)])
+            actions = np.array([envs.single_action_space.sample()
+                               for _ in range(envs.num_envs)])
         else:
             q_values = q_network.apply(q_state.params, obs)
             actions = q_values.argmax(axis=-1)
             actions = jax.device_get(actions)
 
         # TRY NOT TO MODIFY: execute the game and log data.
-        next_obs, rewards, terminations, truncations, infos = envs.step(actions)
+        next_obs, rewards, terminations, truncations, infos = envs.step(
+            actions)
 
         # TRY NOT TO MODIFY: record rewards for plotting purposes
         if "final_info" in infos:
             for info in infos["final_info"]:
                 if info and "episode" in info:
-                    print(f"global_step={global_step}, episodic_return={info['episode']['r']}")
-                    writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
-                    writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
+                    print(f"global_step={global_step}, episodic_return={
+                          info['episode']['r']}")
+                    writer.add_scalar("charts/episodic_return",
+                                      info["episode"]["r"], global_step)
+                    writer.add_scalar("charts/episodic_length",
+                                      info["episode"]["l"], global_step)
 
         # TRY NOT TO MODIFY: save data to reply buffer; handle `final_observation`
         real_next_obs = next_obs.copy()
@@ -269,15 +248,19 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
                 )
 
                 if global_step % 100 == 0:
-                    writer.add_scalar("losses/td_loss", jax.device_get(loss), global_step)
-                    writer.add_scalar("losses/q_values", jax.device_get(old_val).mean(), global_step)
+                    writer.add_scalar("losses/td_loss",
+                                      jax.device_get(loss), global_step)
+                    writer.add_scalar(
+                        "losses/q_values", jax.device_get(old_val).mean(), global_step)
                     print("SPS:", int(global_step / (time.time() - start_time)))
-                    writer.add_scalar("charts/SPS", int(global_step / (time.time() - start_time)), global_step)
+                    writer.add_scalar(
+                        "charts/SPS", int(global_step / (time.time() - start_time)), global_step)
 
             # update target network
             if global_step % args.target_network_frequency == 0:
                 q_state = q_state.replace(
-                    target_params=optax.incremental_update(q_state.params, q_state.target_params, args.tau)
+                    target_params=optax.incremental_update(
+                        q_state.params, q_state.target_params, args.tau)
                 )
 
     if args.save_model:
@@ -303,8 +286,10 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
             from cleanrl_utils.huggingface import push_to_hub
 
             repo_name = f"{args.env_id}-{args.exp_name}-seed{args.seed}"
-            repo_id = f"{args.hf_entity}/{repo_name}" if args.hf_entity else repo_name
-            push_to_hub(args, episodic_returns, repo_id, "DQN", f"runs/{run_name}", f"videos/{run_name}-eval")
+            repo_id = f"{
+                args.hf_entity}/{repo_name}" if args.hf_entity else repo_name
+            push_to_hub(args, episodic_returns, repo_id, "DQN",
+                        f"runs/{run_name}", f"videos/{run_name}-eval")
 
     envs.close()
     writer.close()

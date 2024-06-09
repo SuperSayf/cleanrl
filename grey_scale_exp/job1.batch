@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#SBATCH --job-name="FS_Atari"
+#SBATCH --output="/home-mscluster/sjumoorty2/cleanrl/node_output/node_output_%j.txt"
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
+#SBATCH --time=3-00:00:00
+#SBATCH --partition=bigbatch
+
+# These variables will be set in run.sh
+total_timesteps=${TOTAL_TIMESTEPS}
+kernel_size=${KERNEL_SIZE}
+weighting_scheme=${WEIGHTING_SCHEME}
+
+for i in $(seq 0 $((SLURM_NTASKS-1))); do
+    exp_name="frameskip-val-${frame_skip}-task-N${i}"
+    srun --exclusive -N1 -n1 poetry run python ~/cleanrl/cleanrl/dqn_atari_jax.py \
+    --exp-name ${exp_name} \
+    --env-id ALE/Breakout-v5 \
+    --frame_skip 0 \
+    --total-timesteps ${total_timesteps} \
+    --track \
+    --capture_video \
+    --wandb-project-name atari \
+    --use_grayscale True \
+    --kernel_size ${kernel_size} \
+    --weighting_scheme ${weighting_scheme} &
+
+done
+wait
