@@ -8,9 +8,7 @@
 #SBATCH --partition=bigbatch
 
 # These variables will be set in run.sh
-frame_skip=${FRAME_SKIP}
 total_timesteps=${TOTAL_TIMESTEPS}
-
 use_grayscale=${USE_GRAYSCALE}
 kernel_size=${KERNEL_SIZE}
 weighting_scheme=${WEIGHTING_SCHEME}
@@ -20,7 +18,7 @@ for i in $(seq 0 $((SLURM_NTASKS-1))); do
     srun --exclusive -N1 -n1 poetry run python ~/cleanrl/cleanrl/dqn_atari_jax.py \
     --exp-name ${exp_name} \
     --env-id ALE/Breakout-v5 \
-    --frame_skip ${frame_skip} \
+    --frame_skip 0 \
     --total-timesteps ${total_timesteps} \
     --track \
     --capture_video \
