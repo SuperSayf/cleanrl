@@ -24,20 +24,22 @@ conda activate atari
 export PATH="$HOME/.local/bin:$PATH"
 
 # Check if the correct number of arguments are provided
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <kernel_size> <weighting_scheme> <total_timesteps>"
+if [ "$#" -ne 4 ]; then
+    echo "Usage: $0 <use_grayscale> <kernel_size> <weighting_scheme> <total_timesteps>"
     exit 1
 fi
 
 # Set the variables from the command line arguments
-KERNEL_SIZE=$1
-WEIGHTING_SCHEME=$2
-TOTAL_TIMESTEPS=$3
+USE_GRAYSCALE=$1
+KERNEL_SIZE=$2
+WEIGHTING_SCHEME=$3
+TOTAL_TIMESTEPS=$4
 
 # Export the variables to make them available to the batch script
+export USE_GRAYSCALE
+export KERNEL_SIZE
+export WEIGHTING_SCHEME
 export TOTAL_TIMESTEPS
-export KERNEL_SIZE=3
-export WEIGHTING_SCHEME=luminosity
 
 # Submit the batch file
 sbatch ~/cleanrl/grey_scale_exp/job1.batch

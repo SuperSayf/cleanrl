@@ -82,7 +82,7 @@ class Args:
     """the number of frames to skip"""
 
     # Grayscaling arguments
-    use_grayscale: bool = True
+    use_grayscale: bool = False
     """whether to use grayscaling"""
     kernel_size: int = 1
     """kernel size for grayscaling"""
