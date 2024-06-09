@@ -26,7 +26,7 @@ from stable_baselines3.common.atari_wrappers import (
 )
 from stable_baselines3.common.buffers import ReplayBuffer
 from torch.utils.tensorboard import SummaryWriter
-import cv2
+
 
 @dataclass
 class Args:
@@ -81,28 +81,7 @@ class Args:
     frame_skip: int = 4
     """the number of frames to skip"""
 
-    # Grayscaling arguments
-    use_grayscale: str = "no"
-    """whether to use grayscaling, options: 'yes', 'no'"""
-    kernel_size: int = 1
-    """kernel size for grayscaling"""
-    weighting_scheme: str = "average"
-    """weighting scheme for grayscaling, options: 'average', 'luminosity'"""
-
-
-def custom_grayscale(obs, kernel_size=1, weighting_scheme="average"):
-    if weighting_scheme == "luminosity":
-        weights = np.array([0.299, 0.587, 0.114])
-    else:
-        weights = np.array([1/3, 1/3, 1/3])
-
-    gray_obs = np.dot(obs[..., :3], weights)
-    if kernel_size > 1:
-        gray_obs = cv2.GaussianBlur(gray_obs, (kernel_size, kernel_size), 0)
-    return gray_obs
-
-
-def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, use_grayscale, kernel_size, weighting_scheme):
+def make_env(env_id, seed, idx, capture_video, run_name, frame_skip):
     def thunk():
         if capture_video and idx == 0:
             env = gym.make(env_id, render_mode="rgb_array")
@@ -119,14 +98,44 @@ def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, use_graysca
             env = FireResetEnv(env)
         env = ClipRewardEnv(env)
         env = gym.wrappers.ResizeObservation(env, (84, 84))
-        if use_grayscale == "yes":
-            env = gym.wrappers.TransformObservation(env, lambda obs: custom_grayscale(obs, kernel_size, weighting_scheme))
+        env = gym.wrappers.GrayScaleObservation(env)
         env = gym.wrappers.FrameStack(env, 4)
 
         env.action_space.seed(seed)
         return env
 
     return thunk
+
+
+# ALGO LOGIC: initialize agent here:
+class QNetwork(nn.Module):
+    action_dim: int
+
+    @nn.compact
+    def __call__(self, x):
+        x = jnp.transpose(x, (0, 2, 3, 1))
+        x = x / (255.0)
+        x = nn.Conv(32, kernel_size=(8, 8), strides=(4, 4), padding="VALID")(x)
+        x = nn.relu(x)
+        x = nn.Conv(64, kernel_size=(4, 4), strides=(2, 2), padding="VALID")(x)
+        x = nn.relu(x)
+        x = nn.Conv(64, kernel_size=(3, 3), strides=(1, 1), padding="VALID")(x)
+        x = nn.relu(x)
+        x = x.reshape((x.shape[0], -1))
+        x = nn.Dense(512)(x)
+        x = nn.relu(x)
+        x = nn.Dense(self.action_dim)(x)
+        return x
+
+
+class TrainState(TrainState):
+    target_params: flax.core.FrozenDict
+
+
+def linear_schedule(start_e: float, end_e: float, duration: int, t: int):
+    slope = (end_e - start_e) / duration
+    return max(slope * t + start_e, end_e)
+
 
 if __name__ == "__main__":
     import stable_baselines3 as sb3
@@ -167,7 +176,7 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
 
     # env setup
     envs = gym.vector.SyncVectorEnv(
-        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip, args.use_grayscale, args.kernel_size, args.weighting_scheme) for i in range(args.num_envs)]
+        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip) for i in range(args.num_envs)]
     )
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
