@@ -82,8 +82,8 @@ class Args:
     """the number of frames to skip"""
 
     # Grayscaling arguments
-    use_grayscale: bool = False
-    """whether to use grayscaling"""
+    use_grayscale: str = "no"
+    """whether to use grayscaling, options: 'yes', 'no'"""
     kernel_size: int = 1
     """kernel size for grayscaling"""
     weighting_scheme: str = "average"
@@ -119,7 +119,7 @@ def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, use_graysca
             env = FireResetEnv(env)
         env = ClipRewardEnv(env)
         env = gym.wrappers.ResizeObservation(env, (84, 84))
-        if use_grayscale:
+        if use_grayscale == "yes":
             env = gym.wrappers.TransformObservation(env, lambda obs: custom_grayscale(obs, kernel_size, weighting_scheme))
         env = gym.wrappers.FrameStack(env, 4)
 
