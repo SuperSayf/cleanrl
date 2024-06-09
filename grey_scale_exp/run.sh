@@ -24,7 +24,7 @@ conda activate atari
 export PATH="$HOME/.local/bin:$PATH"
 
 # Check if the correct number of arguments are provided
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 3 ]; then
     echo "Usage: $0 <kernel_size> <weighting_scheme> <total_timesteps>"
     exit 1
 fi
