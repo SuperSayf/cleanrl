@@ -23,10 +23,10 @@ for i in $(seq 0 $((SLURM_NTASKS-1))); do
     --total-timesteps ${total_timesteps} \
     --track \
     --capture_video \
-    --wandb-project-name atari \
-    --use_grayscale ${use_grayscale} \
-    --kernel_size ${kernel_size} \
-    --weighting_scheme ${weighting_scheme} &
+    --wandb-project-name atari &
+    # --use_grayscale ${use_grayscale} \
+    # --kernel_size ${kernel_size} \
+    # --weighting_scheme ${weighting_scheme} &
 
 done
 wait
