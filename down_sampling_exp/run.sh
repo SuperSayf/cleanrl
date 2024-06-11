@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# ./run.sh "64,64" 10000000
-
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/home-mscluster/sjumoorty2/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
@@ -26,14 +24,15 @@ conda activate atari
 export PATH="$HOME/.local/bin:$PATH"
 
 # Check if the correct number of arguments are provided
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <resolutions> <total_timesteps>"
+if [ "$#" -ne 3 ]; then
+    echo "Usage: $0 <resolution_width> <resolution_height> <total_timesteps>"
     exit 1
 fi
 
 # Set the variables from the command line arguments
-IFS=',' read -r RESOLUTION_WIDTH RESOLUTION_HEIGHT <<< "$1"
-TOTAL_TIMESTEPS=$2
+RESOLUTION_WIDTH=$1
+RESOLUTION_HEIGHT=$2
+TOTAL_TIMESTEPS=$3
 
 # Export the variables to make them available to the batch script
 export RESOLUTION_WIDTH
