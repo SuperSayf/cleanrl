@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#SBATCH --job-name="DS_Atari"
+#SBATCH --output="/home-mscluster/sjumoorty2/cleanrl/node_output/node_output_%j.txt"
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
+#SBATCH --time=3-00:00:00
+#SBATCH --partition=bigbatch
+#SBATCH --exclude=mscluster42
+
+# These variables will be set in run.sh
+total_timesteps=${TOTAL_TIMESTEPS}
+resolution=${RESOLUTION}
+
+for i in $(seq 0 $((SLURM_NTASKS-1))); do
+    exp_name="downsampling-val-$(echo ${resolution} | tr ',' '-')"
+    srun --exclusive -N1 -n1 poetry run python ~/cleanrl/cleanrl/dqn_atari_jax.py \
+    --exp-name ${exp_name} \
+    --env-id ALE/Breakout-v5 \
+    --total-timesteps ${total_timesteps} \
+    --resolution ${resolution} \
+    --track \
+    --capture_video \
+    --wandb-project-name atari &
+done
+wait
