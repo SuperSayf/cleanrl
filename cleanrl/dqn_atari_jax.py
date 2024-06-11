@@ -1,4 +1,3 @@
-# Import statements remain the same
 import os
 import random
 import time
@@ -51,8 +50,8 @@ class Args:
     exploration_fraction: float = 0.10
     learning_starts: int = 80000
     train_frequency: int = 4
-    frame_skip: int = 0
-    resolution_width: int = 84 
+    frame_skip: int = 4
+    resolution_width: int = 84
     resolution_height: int = 84
 
 
@@ -96,6 +95,7 @@ class QNetwork(nn.Module):
         x = nn.Conv(64, kernel_size=(3, 3), strides=(1, 1), padding="VALID")(x)
         x = nn.relu(x)
         x = x.reshape((x.shape[0], -1))
+        print(f"Shape after flattening: {x.shape}")
         x = nn.Dense(512)(x)
         x = nn.relu(x)
         x = nn.Dense(self.action_dim)(x)
@@ -147,13 +147,14 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
     key = jax.random.PRNGKey(args.seed)
     key, q_key = jax.random.split(key, 2)
 
+    resolution = (args.resolution_width, args.resolution_height)
     envs = gym.vector.SyncVectorEnv(
-        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip, (args.resolution_width, args.resolution_height)) for i in range(args.num_envs)]
+        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip, resolution) for i in range(args.num_envs)]
     )
-
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
     obs, _ = envs.reset(seed=args.seed)
+    print(f"Initial observation shape: {obs.shape}")
 
     q_network = QNetwork(action_dim=envs.single_action_space.n)
 
