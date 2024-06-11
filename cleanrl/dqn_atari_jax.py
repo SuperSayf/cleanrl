@@ -52,7 +52,8 @@ class Args:
     learning_starts: int = 80000
     train_frequency: int = 4
     frame_skip: int = 0
-    resolution: tuple = (84, 84)
+    resolution_width: int = 84 
+    resolution_height: int = 84
 
 
 def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, resolution):
@@ -147,8 +148,9 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
     key, q_key = jax.random.split(key, 2)
 
     envs = gym.vector.SyncVectorEnv(
-        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip, args.resolution) for i in range(args.num_envs)]
+        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip, (args.resolution_width, args.resolution_height)) for i in range(args.num_envs)]
     )
+
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
     obs, _ = envs.reset(seed=args.seed)

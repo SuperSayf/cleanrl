@@ -10,15 +10,18 @@
 
 # These variables will be set in run.sh
 total_timesteps=${TOTAL_TIMESTEPS}
-resolution=${RESOLUTION}
+resolution_width=${RESOLUTION_WIDTH}
+resolution_height=${RESOLUTION_HEIGHT}
 
 for i in $(seq 0 $((SLURM_NTASKS-1))); do
-    exp_name="downsampling-val-$(echo ${resolution} | tr ',' '-')"
+    exp_name="downsampling-val-${resolution_width}x${resolution_height}"
     srun --exclusive -N1 -n1 poetry run python ~/cleanrl/cleanrl/dqn_atari_jax.py \
     --exp-name ${exp_name} \
     --env-id ALE/Breakout-v5 \
+    --frame_skip 0 \
     --total-timesteps ${total_timesteps} \
-    --resolution ${resolution} \
+    --resolution_width ${resolution_width} \
+    --resolution_height ${resolution_height} \
     --track \
     --capture_video \
     --wandb-project-name atari &

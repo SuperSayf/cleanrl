@@ -27,16 +27,17 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Check if the correct number of arguments are provided
 if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <resolution> <total_timesteps>"
+    echo "Usage: $0 <resolutions> <total_timesteps>"
     exit 1
 fi
 
 # Set the variables from the command line arguments
-RESOLUTION=$1
+IFS=',' read -r RESOLUTION_WIDTH RESOLUTION_HEIGHT <<< "$1"
 TOTAL_TIMESTEPS=$2
 
 # Export the variables to make them available to the batch script
-export RESOLUTION
+export RESOLUTION_WIDTH
+export RESOLUTION_HEIGHT
 export TOTAL_TIMESTEPS
 
 # Submit the batch file
