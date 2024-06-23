@@ -1,0 +1,85 @@
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/deprecations.py:51: DeprecationWarning: jax.interpreters.pxla.ShardedDeviceArray is deprecated. Use jax.Array.
+  warnings.warn(message, DeprecationWarning)
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/deprecations.py:51: DeprecationWarning: jax.numpy.DeviceArray is deprecated. Use jax.Array.
+  warnings.warn(message, DeprecationWarning)
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py:4: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.
+  if not hasattr(tensorboard, "__version__") or LooseVersion(
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/pkg_resources/__init__.py:121: DeprecationWarning: pkg_resources is deprecated as an API
+  warnings.warn("pkg_resources is deprecated as an API", DeprecationWarning)
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/pkg_resources/__init__.py:2870: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+  declare_namespace(pkg)
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/pkg_resources/__init__.py:2870: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('mpl_toolkits')`.
+Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+  declare_namespace(pkg)
+Traceback (most recent call last):
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_init.py", line 1140, in init
+    wi.setup(kwargs)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_init.py", line 171, in setup
+    self._wl = wandb_setup.setup(settings=setup_settings)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 327, in setup
+    ret = _setup(settings=settings)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 320, in _setup
+    wl = _WandbSetup(settings=settings)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 303, in __init__
+    _WandbSetup._instance = _WandbSetup__WandbSetup(settings=settings, pid=pid)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 114, in __init__
+    self._setup()
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 250, in _setup
+    self._setup_manager()
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 277, in _setup_manager
+    self._manager = wandb_manager._Manager(settings=self._settings)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_manager.py", line 146, in __init__
+    self._service.start()
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/service/service.py", line 199, in start
+    self._launch_server()
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/service/service.py", line 193, in _launch_server
+    sentry_reraise(e, delay=True)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/util.py", line 214, in sentry_reraise
+    raise exc.with_traceback(sys.exc_info()[2])
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/service/service.py", line 191, in _launch_server
+    self._wait_for_ports(fname, proc=internal_proc)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/service/service.py", line 141, in _wait_for_ports
+    raise ServiceStartTimeoutError(
+wandb.sdk.service.service.ServiceStartTimeoutError: Timed out waiting for wandb service to start after 30.0 seconds. Try increasing the timeout with the `_service_wait` setting.
+wandb: ERROR Abnormal program exit
+Traceback (most recent call last):
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_init.py", line 1140, in init
+    wi.setup(kwargs)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_init.py", line 171, in setup
+    self._wl = wandb_setup.setup(settings=setup_settings)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 327, in setup
+    ret = _setup(settings=settings)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 320, in _setup
+    wl = _WandbSetup(settings=settings)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 303, in __init__
+    _WandbSetup._instance = _WandbSetup__WandbSetup(settings=settings, pid=pid)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 114, in __init__
+    self._setup()
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 250, in _setup
+    self._setup_manager()
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_setup.py", line 277, in _setup_manager
+    self._manager = wandb_manager._Manager(settings=self._settings)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_manager.py", line 146, in __init__
+    self._service.start()
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/service/service.py", line 199, in start
+    self._launch_server()
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/service/service.py", line 193, in _launch_server
+    sentry_reraise(e, delay=True)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/util.py", line 214, in sentry_reraise
+    raise exc.with_traceback(sys.exc_info()[2])
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/service/service.py", line 191, in _launch_server
+    self._wait_for_ports(fname, proc=internal_proc)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/service/service.py", line 141, in _wait_for_ports
+    raise ServiceStartTimeoutError(
+wandb.sdk.service.service.ServiceStartTimeoutError: Timed out waiting for wandb service to start after 30.0 seconds. Try increasing the timeout with the `_service_wait` setting.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home-mscluster/sjumoorty2/cleanrl/cleanrl/dqn_atari_jax.py", line 130, in <module>
+    wandb.init(
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/wandb_init.py", line 1181, in init
+    raise Exception("problem") from error_seen
+Exception: problem
+srun: error: mscluster63: task 0: Exited with exit code 1

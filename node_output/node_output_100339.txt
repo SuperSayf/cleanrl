@@ -1,0 +1,109 @@
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/deprecations.py:51: DeprecationWarning: jax.interpreters.pxla.ShardedDeviceArray is deprecated. Use jax.Array.
+  warnings.warn(message, DeprecationWarning)
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/deprecations.py:51: DeprecationWarning: jax.numpy.DeviceArray is deprecated. Use jax.Array.
+  warnings.warn(message, DeprecationWarning)
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/torch/utils/tensorboard/__init__.py:4: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.
+  if not hasattr(tensorboard, "__version__") or LooseVersion(
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/pkg_resources/__init__.py:121: DeprecationWarning: pkg_resources is deprecated as an API
+  warnings.warn("pkg_resources is deprecated as an API", DeprecationWarning)
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/pkg_resources/__init__.py:2870: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+  declare_namespace(pkg)
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/pkg_resources/__init__.py:2870: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('mpl_toolkits')`.
+Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+  declare_namespace(pkg)
+wandb: W&B API key is configured. Use `wandb login --relogin` to force relogin
+wandb: - Waiting for wandb.init()...wandb: \ Waiting for wandb.init()...wandb: | Waiting for wandb.init()...wandb: / Waiting for wandb.init()...wandb: - Waiting for wandb.init()...wandb: \ Waiting for wandb.init()...wandb: | Waiting for wandb.init()...wandb: wandb version 0.17.1 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.13.11
+wandb: Run data is saved locally in /home-mscluster/sjumoorty2/cleanrl/down_sampling_exp/wandb/run-20240614_174129-qpvrw9ob
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run ALE/Breakout-v5__downsampling-val-74x74__1__1718379650
+wandb: ⭐️ View project at https://wandb.ai/sayf/atari
+wandb: 🚀 View run at https://wandb.ai/sayf/atari/runs/qpvrw9ob
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/wandb/sdk/lib/import_hooks.py:243: DeprecationWarning: Deprecated since Python 3.4 and slated for removal in Python 3.12; use importlib.util.find_spec() instead
+  loader = importlib.find_loader(fullname, path)
+A.L.E: Arcade Learning Environment (version 0.8.1+53f58b7)
+[Powered by Stella]
+/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/gymnasium/utils/passive_env_checker.py:364: UserWarning: [33mWARN: No render fps was declared in the environment (env.metadata['render_fps'] is None or not defined), rendering may occur at inconsistent fps.[0m
+  logger.warn(
+2024-06-14 17:45:27.637803: E external/xla/xla/stream_executor/cuda/cuda_blas.cc:190] failed to create cublas handle: cublas error
+2024-06-14 17:45:27.637956: E external/xla/xla/stream_executor/cuda/cuda_blas.cc:193] Failure to initialize cublas may be due to OOM (cublas needs some free memory when you initialize it, and your deep-learning framework may have preallocated more than its fair share), or may be because this binary was not built with support for the GPU in your machine.
+2024-06-14 17:45:43.711190: W external/xla/xla/service/gpu/gpu_conv_algorithm_picker.cc:850] None of the algorithms provided by cuDNN heuristics worked; trying fallback algorithms.
+2024-06-14 17:45:43.785412: W external/xla/xla/service/gpu/gpu_conv_algorithm_picker.cc:853] Conv: (f32[1,32,17,17]{3,2,1,0}, u8[0]{0}) custom-call(f32[1,4,74,74]{3,2,1,0}, f32[32,4,8,8]{3,2,1,0}), window={size=8x8 stride=4x4}, dim_labels=bf01_oi01->bf01, custom_call_target="__cudnn$convForward", backend_config="{\"conv_result_scale\":1,\"activation_mode\":\"0\",\"side_input_scale\":0}"
+2024-06-14 17:46:15.276276: E external/xla/xla/pjrt/pjrt_stream_executor_client.cc:2432] Execution of replica 0 failed: INTERNAL: Failed to load in-memory CUBIN: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+Initial observation shape: (1, 4, 74, 74)
+Traceback (most recent call last):
+  File "/home-mscluster/sjumoorty2/cleanrl/cleanrl/dqn_atari_jax.py", line 163, in <module>
+    params=q_network.init(q_key, obs),
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/traceback_util.py", line 166, in reraise_with_filtered_traceback
+    return fun(*args, **kwargs)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/flax/linen/module.py", line 1621, in init
+    _, v_out = self.init_with_output(
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/traceback_util.py", line 166, in reraise_with_filtered_traceback
+    return fun(*args, **kwargs)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/flax/linen/module.py", line 1526, in init_with_output
+    return init_with_output(
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/flax/core/scope.py", line 965, in wrapper
+    return apply(fn, mutable=mutable, flags=init_flags)({}, *args, rngs=rngs,
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/flax/core/scope.py", line 933, in wrapper
+    y = fn(root, *args, **kwargs)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/flax/linen/module.py", line 2102, in scope_fn
+    return fn(module.clone(parent=scope), *args, **kwargs)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/flax/linen/module.py", line 427, in wrapped_module_method
+    return self._call_wrapped_method(fun, args, kwargs)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/flax/linen/module.py", line 845, in _call_wrapped_method
+    y = fun(self, *args, **kwargs)
+  File "/home-mscluster/sjumoorty2/cleanrl/cleanrl/dqn_atari_jax.py", line 91, in __call__
+    x = nn.Conv(32, kernel_size=(8, 8), strides=(4, 4), padding="VALID")(x)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/flax/linen/module.py", line 427, in wrapped_module_method
+    return self._call_wrapped_method(fun, args, kwargs)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/flax/linen/module.py", line 845, in _call_wrapped_method
+    y = fun(self, *args, **kwargs)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/flax/linen/linear.py", line 449, in __call__
+    y = self.conv_general_dilated(
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/lax/convolution.py", line 162, in conv_general_dilated
+    return conv_general_dilated_p.bind(
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/core.py", line 360, in bind
+    return self.bind_with_trace(find_top_trace(args), args, params)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/core.py", line 363, in bind_with_trace
+    out = trace.process_primitive(self, map(trace.full_raise, args), params)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/core.py", line 817, in process_primitive
+    return primitive.impl(*tracers, **params)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/dispatch.py", line 129, in apply_primitive
+    return compiled_fun(*args)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/dispatch.py", line 211, in <lambda>
+    return lambda *args, **kw: compiled(*args, **kw)[0]
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/profiler.py", line 314, in wrapper
+    return func(*args, **kwargs)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/interpreters/pxla.py", line 1916, in __call__
+    results = self.xla_executable.execute_sharded(input_bufs)
+jax._src.traceback_util.UnfilteredStackTrace: jaxlib.xla_extension.XlaRuntimeError: INTERNAL: Failed to load in-memory CUBIN: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+
+The stack trace below excludes JAX-internal frames.
+The preceding is the original exception that occurred, unmodified.
+
+--------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home-mscluster/sjumoorty2/cleanrl/cleanrl/dqn_atari_jax.py", line 163, in <module>
+    params=q_network.init(q_key, obs),
+  File "/home-mscluster/sjumoorty2/cleanrl/cleanrl/dqn_atari_jax.py", line 91, in __call__
+    x = nn.Conv(32, kernel_size=(8, 8), strides=(4, 4), padding="VALID")(x)
+  File "/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/flax/linen/linear.py", line 449, in __call__
+    y = self.conv_general_dilated(
+jaxlib.xla_extension.XlaRuntimeError: INTERNAL: Failed to load in-memory CUBIN: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: 
+wandb: Run history:
+wandb: global_step ▁
+wandb: 
+wandb: Run summary:
+wandb: global_step 0
+wandb: 
+wandb: 🚀 View run ALE/Breakout-v5__downsampling-val-74x74__1__1718379650 at: https://wandb.ai/sayf/atari/runs/qpvrw9ob
+wandb: Synced 7 W&B file(s), 0 media file(s), 3 artifact file(s) and 2 other file(s)
+wandb: Find logs at: ./wandb/run-20240614_174129-qpvrw9ob/logs
+srun: error: mscluster42: task 0: Exited with exit code 1

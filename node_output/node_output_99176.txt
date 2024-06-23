@@ -1,0 +1,4 @@
+srun: error: Task launch for StepId=99176.0 failed on node mscluster60: Job credential expired
+srun: error: Application launch failed: Job credential expired
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: error: Timed out waiting for job step to complete
