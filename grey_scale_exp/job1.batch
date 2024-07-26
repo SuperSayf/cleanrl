@@ -6,27 +6,28 @@
 #SBATCH --nodes=1
 #SBATCH --time=3-00:00:00
 #SBATCH --partition=bigbatch
-#SBATCH --exclude=mscluster42
+#SBATCH --exclude=mscluster[42,44,54,57,59,60,62,65,68,69,75,76]
 
 # These variables will be set in run.sh
 total_timesteps=${TOTAL_TIMESTEPS}
 use_grayscale=${USE_GRAYSCALE}
-kernel_size=${KERNEL_SIZE}
-weighting_scheme=${WEIGHTING_SCHEME}
 
 for i in $(seq 0 $((SLURM_NTASKS-1))); do
-    exp_name="grayscale-val-kernel-${kernel_size}-weight-${weighting_scheme}"
+    exp_name="grayscale"
+    if [ "$use_grayscale" = true ]; then
+        grayscale_arg="--grayscale"
+    else
+        grayscale_arg=""
+    fi
+
     srun --exclusive -N1 -n1 poetry run python ~/cleanrl/cleanrl/dqn_atari_jax.py \
     --exp-name ${exp_name} \
     --env-id ALE/Breakout-v5 \
     --frame_skip 0 \
-    --total-timesteps ${total_timesteps} \
     --track \
-    --capture_video \
-    --wandb-project-name atari &
-    # --use_grayscale ${use_grayscale} \
-    # --kernel_size ${kernel_size} \
-    # --weighting_scheme ${weighting_scheme} &
+    --wandb-project-name atari \
+    --total-timesteps ${total_timesteps} \
+    $grayscale_arg &
 
 done
 wait

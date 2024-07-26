@@ -1,8 +1,0 @@
-/home-mscluster/sjumoorty2/anaconda3/envs/atari/lib/python3.10/site-packages/jax/_src/deprecations.py:51: DeprecationWarning: jax.interpreters.pxla.ShardedDeviceArray is deprecated. Use jax.Array.
-  warnings.warn(message, DeprecationWarning)
-srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
-srun: got SIGCONT
-slurmstepd-mscluster42: error: *** STEP 100368.0 ON mscluster42 CANCELLED AT 2024-06-14T17:50:10 ***
-slurmstepd-mscluster42: error: *** JOB 100368 ON mscluster42 CANCELLED AT 2024-06-14T17:50:11 ***
-srun: forcing job termination
-srun: error: mscluster42: task 0: Terminated

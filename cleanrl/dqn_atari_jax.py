@@ -24,7 +24,6 @@ from stable_baselines3.common.atari_wrappers import (
 from stable_baselines3.common.buffers import ReplayBuffer
 from torch.utils.tensorboard import SummaryWriter
 
-
 @dataclass
 class Args:
     exp_name: str = os.path.basename(__file__)[: -len(".py")]
@@ -53,9 +52,9 @@ class Args:
     frame_skip: int = 4
     resolution_width: int = 84
     resolution_height: int = 84
+    grayscale: bool = True  # New parameter for grayscale conversion
 
-
-def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, resolution):
+def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, resolution, grayscale):
     def thunk():
         if capture_video and idx == 0:
             env = gym.make(env_id, render_mode="rgb_array")
@@ -72,14 +71,14 @@ def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, resolution)
             env = FireResetEnv(env)
         env = ClipRewardEnv(env)
         env = gym.wrappers.ResizeObservation(env, resolution)
-        env = gym.wrappers.GrayScaleObservation(env)
+        if grayscale:
+            env = gym.wrappers.GrayScaleObservation(env)  # Conditionally apply grayscale
         env = gym.wrappers.FrameStack(env, 4)
 
         env.action_space.seed(seed)
         return env
 
     return thunk
-
 
 class QNetwork(nn.Module):
     action_dim: int
@@ -101,15 +100,12 @@ class QNetwork(nn.Module):
         x = nn.Dense(self.action_dim)(x)
         return x
 
-
 class TrainState(TrainState):
     target_params: flax.core.FrozenDict
-
 
 def linear_schedule(start_e: float, end_e: float, duration: int, t: int):
     slope = (end_e - start_e) / duration
     return max(slope * t + start_e, end_e)
-
 
 if __name__ == "__main__":
     import stable_baselines3 as sb3
@@ -149,7 +145,7 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
 
     resolution = (args.resolution_width, args.resolution_height)
     envs = gym.vector.SyncVectorEnv(
-        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip, resolution) for i in range(args.num_envs)]
+        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip, resolution, args.grayscale) for i in range(args.num_envs)]
     )
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
