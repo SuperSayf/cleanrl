@@ -8,6 +8,9 @@
 #SBATCH --partition=bigbatch
 #SBATCH --exclude=mscluster[42,44,54,57,59,60,62,65,68,69,75,76]
 
+# Force JAX to use CPU
+# export JAX_PLATFORM_NAME=cpu
+
 # These variables will be set in run.sh
 frame_skip=${FRAME_SKIP}
 total_timesteps=${TOTAL_TIMESTEPS}

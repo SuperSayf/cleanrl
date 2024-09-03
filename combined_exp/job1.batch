@@ -1,0 +1,52 @@
+#!/bin/bash
+
+#SBATCH --job-name="Atari"
+#SBATCH --output="/home-mscluster/sjumoorty2/cleanrl/node_output/node_output_%j.txt"
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
+#SBATCH --time=3-00:00:00
+#SBATCH --partition=bigbatch
+#SBATCH --exclude=mscluster[42,44,54,57,59,60,62,65,68,69,75,76]
+
+# These variables are set in run.sh
+use_grayscale=${USE_GRAYSCALE}
+frame_skip=${FRAME_SKIP}
+use_compression=${USE_COMPRESSION}
+jpeg_quality=${JPEG_QUALITY}
+resolution_width=${RESOLUTION_WIDTH}
+resolution_height=${RESOLUTION_HEIGHT}
+total_timesteps=${TOTAL_TIMESTEPS}
+
+for i in $(seq 0 $((SLURM_NTASKS-1))); do
+    exp_name="combined-exp-task-N${i}"
+    args=""
+
+    # Add arguments based on the configuration
+    [ "$use_grayscale" = true ] && args+=" --grayscale"
+    [ "$frame_skip" -ne 0 ] && args+=" --frame-skip $frame_skip"
+    [ "$use_compression" = true ] && args+=" --use_compression --jpeg_quality $jpeg_quality"
+    [ "$resolution_width" -ne 84 ] || [ "$resolution_height" -ne 84 ] && args+=" --resolution_width $resolution_width --resolution_height $resolution_height"
+
+    srun --exclusive -N1 -n1 poetry run python ~/cleanrl/cleanrl/dqn_atari_jax.py \
+    --exp-name ${exp_name} \
+    --env-id ALE/Breakout-v5 \
+    --total-timesteps ${total_timesteps} \
+    --track \
+    --wandb-project-name atari \
+    $args &
+done
+wait
+
+# poetry run python ~/cleanrl/cleanrl/dqn_atari_jax.py \
+# --exp-name combined-exp-task-N0 \
+# --env-id ALE/Breakout-v5 \
+# --total-timesteps 1000 \
+# --track \
+# --capture_video \
+# --wandb-project-name atari \
+# --grayscale \
+# --frame-skip 2 \
+# --use_compression \
+# --jpeg_quality 75 \
+# --resolution_width 84 \
+# --resolution_height 84

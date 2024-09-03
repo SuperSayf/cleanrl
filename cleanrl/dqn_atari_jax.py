@@ -2,6 +2,11 @@ import os
 import random
 import time
 from dataclasses import dataclass
+import io
+from PIL import Image
+from pathlib import Path
+import cv2
+import numpy as np
 
 os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.7"
 
@@ -52,9 +57,11 @@ class Args:
     frame_skip: int = 4
     resolution_width: int = 84
     resolution_height: int = 84
-    grayscale: bool = True  # New parameter for grayscale conversion
+    grayscale: bool = False
+    jpeg_quality: int = 50
+    use_compression: bool = False
 
-def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, resolution, grayscale):
+def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, resolution, grayscale, use_compression, jpeg_quality):
     def thunk():
         if capture_video and idx == 0:
             env = gym.make(env_id, render_mode="rgb_array")
@@ -72,21 +79,56 @@ def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, resolution,
         env = ClipRewardEnv(env)
         env = gym.wrappers.ResizeObservation(env, resolution)
         if grayscale:
-            env = gym.wrappers.GrayScaleObservation(env)  # Conditionally apply grayscale
+            env = gym.wrappers.GrayScaleObservation(env)
         env = gym.wrappers.FrameStack(env, 4)
+
+        if use_compression:
+            env = JPEGCompressionWrapper(env, quality=jpeg_quality)
 
         env.action_space.seed(seed)
         return env
 
     return thunk
 
+class JPEGCompressionWrapper(gym.Wrapper):
+    def __init__(self, env, quality=50):
+        super().__init__(env)
+        self.quality = quality
+
+    def step(self, action):
+        observation, reward, terminated, truncated, info = self.env.step(action)
+        compressed_observation = self.compress_observation(observation)
+        return compressed_observation, reward, terminated, truncated, info
+
+    def reset(self, **kwargs):
+        observation, info = self.env.reset(**kwargs)
+        compressed_observation = self.compress_observation(observation)
+        return compressed_observation, info
+
+    def compress_observation(self, observation):
+        compressed = []
+        for frame in observation:
+            img = Image.fromarray(frame)
+            buffer = io.BytesIO()
+            img.save(buffer, format="JPEG", quality=self.quality)
+            buffer.seek(0)
+            compressed_img = Image.open(buffer)
+            compressed.append(np.array(compressed_img))
+        return np.array(compressed)
+
 class QNetwork(nn.Module):
     action_dim: int
 
     @nn.compact
     def __call__(self, x):
-        x = jnp.transpose(x, (0, 2, 3, 1))
-        x = x / (255.0)
+        # Check if the input is grayscale or RGB
+        if x.shape[-1] == 3:  # RGB
+            x = jnp.transpose(x, (0, 2, 3, 1, 4))
+            x = x.reshape((x.shape[0], x.shape[1], x.shape[2], -1))
+        else:  # Grayscale
+            x = jnp.transpose(x, (0, 2, 3, 1))
+
+        x = x / 255.0
         x = nn.Conv(32, kernel_size=(8, 8), strides=(4, 4), padding="VALID")(x)
         x = nn.relu(x)
         x = nn.Conv(64, kernel_size=(4, 4), strides=(2, 2), padding="VALID")(x)
@@ -106,6 +148,43 @@ class TrainState(TrainState):
 def linear_schedule(start_e: float, end_e: float, duration: int, t: int):
     slope = (end_e - start_e) / duration
     return max(slope * t + start_e, end_e)
+
+def create_preprocessed_video(env, num_frames=100, filename="preprocessed_video.mp4"):
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = None
+    obs, _ = env.reset()
+    
+    for _ in range(num_frames):
+        if out is None:
+            # Determine the shape and color mode
+            if len(obs.shape) == 3:  # Grayscale
+                height, width = obs.shape[1:]
+                is_color = False
+                out = cv2.VideoWriter(filename, fourcc, 30.0, (width, height), isColor=False)
+            else:  # RGB
+                height, width, _ = obs.shape[1:4]
+                is_color = True
+                out = cv2.VideoWriter(filename, fourcc, 30.0, (width, height), isColor=True)
+        
+        # If the observation is a stack of frames, take the last one
+        frame = obs[-1] if len(obs.shape) > 3 else obs
+        
+        # Convert grayscale to single channel for video writing
+        if not is_color:
+            frame = frame[-1]  # Take the last frame in the stack
+            frame = frame.squeeze()  # Ensure it's a single channel
+        else:
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        
+        out.write(frame)
+        
+        action = env.action_space.sample()
+        obs, _, done, _, _ = env.step(action)
+        if done:
+            obs, _ = env.reset()
+    
+    out.release()
+    print(f"Preprocessed video saved as {filename}")
 
 if __name__ == "__main__":
     import stable_baselines3 as sb3
@@ -145,12 +224,16 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
 
     resolution = (args.resolution_width, args.resolution_height)
     envs = gym.vector.SyncVectorEnv(
-        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip, resolution, args.grayscale) for i in range(args.num_envs)]
+        [make_env(args.env_id, args.seed + i, i, args.capture_video, run_name, args.frame_skip, resolution, args.grayscale, args.use_compression, args.jpeg_quality) for i in range(args.num_envs)]
     )
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
     obs, _ = envs.reset(seed=args.seed)
-    print(f"Initial observation shape: {obs.shape}")
+    print(f"Observation shape: {obs.shape}")
+    if args.grayscale:
+        assert obs.shape == (args.num_envs, 4, args.resolution_height, args.resolution_width), "Unexpected observation shape for grayscale"
+    else:
+        assert obs.shape == (args.num_envs, 4, args.resolution_height, args.resolution_width, 3), "Unexpected observation shape for RGB"
 
     q_network = QNetwork(action_dim=envs.single_action_space.n)
 
@@ -268,3 +351,9 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
 
     envs.close()
     writer.close()
+
+    # Create the preprocessed video
+    output_dir = Path("preprocessed_videos")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    video_filename = output_dir / f"{args.env_id.replace('/', '_')}_preprocessed.mp4"
+    create_preprocessed_video(envs.envs[0], num_frames=100, filename=str(video_filename))

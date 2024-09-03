@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#SBATCH --job-name="C_Atari"
+#SBATCH --output="/home-mscluster/sjumoorty2/cleanrl/node_output/node_output_%j.txt"
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
+#SBATCH --time=3-00:00:00
+#SBATCH --partition=bigbatch
+#SBATCH —exclude=mscluster[8,9,35,42,44,54,57,59,62,65,68,75,76]
+
+# These variables will be set in run.sh
+total_timesteps=${TOTAL_TIMESTEPS}
+use_compression=${USE_COMPRESSION}
+jpeg_quality=${JPEG_QUALITY}
+
+for i in $(seq 0 $((SLURM_NTASKS-1))); do
+    exp_name="compression-val-${jpeg_quality}-task-N${i}"
+    if [ "$use_compression" = true ]; then
+        compression_arg="--use_compression"
+    else
+        compression_arg=""
+    fi
+
+    srun --exclusive -N1 -n1 poetry run python ~/cleanrl/cleanrl/dqn_atari_jax.py \
+    --exp-name ${exp_name} \
+    --env-id ALE/Breakout-v5 \
+    --jpeg_quality ${jpeg_quality} \
+    --track \
+    --wandb-project-name atari \
+    --total-timesteps ${total_timesteps} \
+    $compression_arg &
+
+done
+wait
