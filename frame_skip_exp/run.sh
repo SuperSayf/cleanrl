@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
+# Try the original conda setup
 __conda_setup="$('/home-mscluster/sjumoorty2/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
@@ -13,7 +12,21 @@ else
     fi
 fi
 unset __conda_setup
-# <<< conda initialize <<<
+
+# If the above fails, try the alternative setup
+if ! command -v conda &> /dev/null; then
+    __conda_setup="$('/home-mscluster/mdawood/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "/home-mscluster/mdawood/miniconda3/etc/profile.d/conda.sh" ]; then
+            . "/home-mscluster/mdawood/miniconda3/etc/profile.d/conda.sh"
+        else
+            export PATH="/home-mscluster/mdawood/miniconda3/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+fi
 
 cd ~/cleanrl/frame_skip_exp
 
