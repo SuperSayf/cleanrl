@@ -49,6 +49,7 @@ JPEG_QUALITY=95
 RESOLUTION_WIDTH=84
 RESOLUTION_HEIGHT=84
 TOTAL_TIMESTEPS=10000000
+JOB_PARTITION=bigbatch
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -58,6 +59,7 @@ while [[ $# -gt 0 ]]; do
         --compression) USE_COMPRESSION=true; JPEG_QUALITY=$2; shift 2 ;;
         --resolution) RESOLUTION_WIDTH=$2; RESOLUTION_HEIGHT=$3; shift 3 ;;
         --total-timesteps) TOTAL_TIMESTEPS=$2; shift 2 ;;
+        --job-partition) JOB_PARTITION=$2; shift 2 ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
     esac
 done
@@ -70,6 +72,7 @@ export JPEG_QUALITY
 export RESOLUTION_WIDTH
 export RESOLUTION_HEIGHT
 export TOTAL_TIMESTEPS
+export JOB_PARTITION
 
 # Submit the batch file
-sbatch ~/cleanrl/combined_exp/job1.batch
+sbatch --partition=${JOB_PARTITION} ~/cleanrl/combined_exp/job1.batch

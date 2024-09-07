@@ -55,7 +55,7 @@ TOTAL_TIMESTEPS=$2
 export FRAME_SKIP
 export TOTAL_TIMESTEPS
 
-JOB_PARTITION=stampede
+JOB_PARTITION=bigbatch
 
 # Submit the batch file
 sbatch --partition=${JOB_PARTITION} ~/cleanrl/frame_skip_exp/job1.batch
