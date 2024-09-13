@@ -60,6 +60,7 @@ class Args:
     grayscale: bool = False
     jpeg_quality: int = 50
     use_compression: bool = False
+    generate_preview: bool = False  # Added this line
 
 def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, resolution, grayscale, use_compression, jpeg_quality):
     def thunk():
@@ -202,6 +203,16 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
     if args.track:
         import wandb
 
+        # Create the experiment tag
+        experiment_effects = []
+        if args.grayscale:
+            experiment_effects.append(f"grayscale")
+        if args.use_compression:
+            experiment_effects.append(f"jpeg_quality_{args.jpeg_quality}")
+        experiment_effects.append(f"resolution_{args.resolution_width}x{args.resolution_height}")
+        experiment_effects.append(f"frame_skip_{args.frame_skip}")
+        experiment_tag = "_".join(experiment_effects)
+
         wandb.init(
             project=args.wandb_project_name,
             entity=args.wandb_entity,
@@ -211,6 +222,9 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
             monitor_gym=True,
             save_code=True,
         )
+        
+        # Add the experiment tag to the wandb config
+        wandb.run.tags = wandb.run.tags + (experiment_tag,)
     writer = SummaryWriter(f"runs/{run_name}")
     writer.add_text(
         "hyperparameters",
@@ -352,8 +366,9 @@ poetry run pip install "stable_baselines3==2.0.0a1" "gymnasium[atari,accept-rom-
     envs.close()
     writer.close()
 
-    # Create the preprocessed video
-    output_dir = Path("preprocessed_videos")
-    output_dir.mkdir(parents=True, exist_ok=True)
-    video_filename = output_dir / f"{args.env_id.replace('/', '_')}_preprocessed.mp4"
-    create_preprocessed_video(envs.envs[0], num_frames=100, filename=str(video_filename))
+    # Create the preprocessed video only if generate_preview is True
+    if args.generate_preview:
+        output_dir = Path("preprocessed_videos")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        video_filename = output_dir / f"{args.env_id.replace('/', '_')}_preprocessed.mp4"
+        create_preprocessed_video(envs.envs[0], num_frames=100, filename=str(video_filename))
