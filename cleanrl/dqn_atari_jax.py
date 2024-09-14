@@ -54,13 +54,13 @@ class Args:
     exploration_fraction: float = 0.10
     learning_starts: int = 80000
     train_frequency: int = 4
-    frame_skip: int = 4
+    frame_skip: int = 0
     resolution_width: int = 84
     resolution_height: int = 84
     grayscale: bool = False
-    jpeg_quality: int = 50
+    jpeg_quality: int = 100
     use_compression: bool = False
-    generate_preview: bool = False  # Added this line
+    generate_preview: bool = False
 
 def make_env(env_id, seed, idx, capture_video, run_name, frame_skip, resolution, grayscale, use_compression, jpeg_quality):
     def thunk():
