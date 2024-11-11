@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
 #SBATCH --time=3-00:00:00
-#SBATCH --exclude=mscluster[2,6,14,15,16,10,11,12,13,19,26,3,4,7,8,41,5,9,35,38,47,60,62,69,74,78,79,80,81,82,64,42,43,44,45,46,48,49,50,83,65,68,75,76]
+#SBATCH --exclude=mscluster[2,6,14,15,16,10,11,12,13,19,26,3,4,7,8,41,5,9,35,37,38,39,47,60,62,69,74,78,79,80,81,82,64,42,43,44,45,46,48,49,50,83,65,68,75,76,24,22,20,23,27,25,21,18,17,54]
 
 # These variables are set in run.sh
 use_grayscale=${USE_GRAYSCALE}
@@ -17,7 +17,7 @@ resolution_height=${RESOLUTION_HEIGHT}
 total_timesteps=${TOTAL_TIMESTEPS}
 
 for i in $(seq 0 $((SLURM_NTASKS-1))); do
-    exp_name="combined-exp-task-N${i}"
+    exp_name="combined-exp-task"
     args=""
 
     # Add arguments based on the configuration
@@ -28,10 +28,10 @@ for i in $(seq 0 $((SLURM_NTASKS-1))); do
 
     srun --exclusive -N1 -n1 poetry run python ~/cleanrl/cleanrl/dqn_atari_jax.py \
     --exp-name ${exp_name} \
-    --env-id ALE/Breakout-v5 \
+    --env-id ALE/Pitfall-v5 \
     --total-timesteps ${total_timesteps} \
     --track \
-    --wandb-project-name atari \
+    --wandb-project-name atari-set-10 \
     $args &
 done
 wait
